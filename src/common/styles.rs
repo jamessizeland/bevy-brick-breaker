@@ -34,7 +34,7 @@ pub fn spawn_full_screen_menu_button<T : Default>(
         parent.spawn(
             TextBundle::from_section(format!("{} [{:?}]", label.into(), key_code), TextStyle {
                 font: asset_server.load("fonts/OpenSans-Regular.ttf"),
-                font_size: 40.,
+                font_size: 32.,
                 color: Color::BLACK,
             }).with_style(Style {
                 margin: UiRect::new(Val::Px(0.), Val::Px(0.), Val::Px(0.), Val::Px(6.)),
