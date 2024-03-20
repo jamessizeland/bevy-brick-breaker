@@ -24,7 +24,7 @@ pub enum AppState {
 
 fn main() {
     App::new()
-        .add_state::<AppState>()
+        .init_state::<AppState>()
         .add_plugins(DefaultPlugins)
         .insert_resource(TextSettings {
             allow_dynamic_font_size: true,
@@ -77,6 +77,6 @@ fn guard_resolution(
             let mut window = window_query.get_single_mut().unwrap();
             window.resolution.set(MIN_WINDOW_WIDTH_TO_HEIGHT * e.height, e.height);
         }
-        ui_scale.0 = (e.height / WINDOW_WORLD_HEIGHT) as f64;
+        ui_scale.0 = e.height / WINDOW_WORLD_HEIGHT;
     }
 }

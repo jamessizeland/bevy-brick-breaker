@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::common::better_button::{ReleaseButton};
+use crate::common::better_button::ReleaseButton;
 use crate::common::styles::{get_full_screen_menu_node_bundle, spawn_full_screen_menu_button, spawn_full_screen_menu_header};
 use crate::game::events::{MenuRequested, RestartRequested, TogglePauseRequested};
 
@@ -24,9 +24,9 @@ pub fn spawn_pause_view(
         )
     ).with_children(|parent| {
         spawn_full_screen_menu_header(parent, &asset_server, "Pause");
-        spawn_full_screen_menu_button::<ContinueButton>(parent, &asset_server, "Continue", KeyCode::C);
-        spawn_full_screen_menu_button::<RestartButton>(parent, &asset_server, "Restart", KeyCode::R);
-        spawn_full_screen_menu_button::<MenuButton>(parent, &asset_server, "Menu", KeyCode::M);
+        spawn_full_screen_menu_button::<ContinueButton>(parent, &asset_server, "Continue", KeyCode::KeyC);
+        spawn_full_screen_menu_button::<RestartButton>(parent, &asset_server, "Restart", KeyCode::KeyR);
+        spawn_full_screen_menu_button::<MenuButton>(parent, &asset_server, "Menu", KeyCode::KeyM);
     });
 }
 

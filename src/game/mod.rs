@@ -13,7 +13,7 @@ mod pause_view;
 mod preparation_view;
 
 use bevy::prelude::*;
-use crate::{AppState};
+use crate::AppState;
 
 use paddle::{despawn_paddles, spawn_paddle, move_paddle, keep_paddle_synced_with_settings};
 use ball::{ spawn_first_ball, move_balls, despawn_balls };
@@ -45,7 +45,7 @@ enum InGameState {
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_state::<InGameState>()
+            .init_state::<InGameState>()
             .init_resource::<Score>()
             .init_resource::<BrickRowSpawnCooldown>()
             .init_resource::<BallSize>()
@@ -146,13 +146,13 @@ fn clean_up(
 }
 
 fn check_preparation_end_condition(
-    keyboard_input: Res<Input<KeyCode>>,
-    mouse_input: Res<Input<MouseButton>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mouse_input: Res<ButtonInput<MouseButton>>,
     mut next_state: ResMut<NextState<InGameState>>,
 )
 {
     if let Some(key) = keyboard_input.get_just_pressed().next() {
-        if *key != KeyCode::Left && *key != KeyCode::Right {
+        if *key != KeyCode::ArrowLeft && *key != KeyCode::ArrowRight {
             next_state.set(InGameState::Play);
         }
     }
@@ -211,7 +211,7 @@ fn check_summary_condition(
 }
 
 fn check_toggle_pause_condition(
-    input: Res<Input<KeyCode>>,
+    input: Res<ButtonInput<KeyCode>>,
     current_state: Res<State<InGameState>>,
     mut next_state: ResMut<NextState<InGameState>>,
     mut toggle_pause_requested_events: EventReader<TogglePauseRequested>,
@@ -242,7 +242,7 @@ fn check_toggle_pause_condition(
 }
 
 pub fn test_settings(
-    input: Res<Input<KeyCode>>,
+    input: Res<ButtonInput<KeyCode>>,
     mut ball_size: ResMut<BallSize>,
     mut ball_speed: ResMut<BallSpeed>,
     mut brick_ghost: ResMut<BrickGhost>,
@@ -251,27 +251,27 @@ pub fn test_settings(
 )
 {
     let value =
-        if input.just_pressed(KeyCode::Q) { -1 }
-        else if input.just_pressed(KeyCode::E) { 1 }
+        if input.just_pressed(KeyCode::KeyQ) { -1 }
+        else if input.just_pressed(KeyCode::KeyE) { 1 }
         else { 0 };
 
     if value == 0 {
         return;
     }
 
-    if input.pressed(KeyCode::Key1) {
+    if input.pressed(KeyCode::Digit1) {
         paddle_size.change_points(value);
     }
-    if input.pressed(KeyCode::Key2) {
+    if input.pressed(KeyCode::Digit2) {
         paddle_speed.change_points(value);
     }
-    if input.pressed(KeyCode::Key3) {
+    if input.pressed(KeyCode::Digit3) {
         ball_size.change_points(value);
     }
-    if input.pressed(KeyCode::Key4) {
+    if input.pressed(KeyCode::Digit4) {
         ball_speed.change_points(value);
     }
-    if input.pressed(KeyCode::Key5) {
+    if input.pressed(KeyCode::Digit5) {
         brick_ghost.set_enabled(value > 0);
     }
 }

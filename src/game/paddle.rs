@@ -121,17 +121,17 @@ pub fn despawn_paddles(
 }
 
 pub fn move_paddle(
-    input: Res<Input<KeyCode>>,
+    input: Res<ButtonInput<KeyCode>>,
     mut paddle_query: Query<(&mut Transform, &BoxCollider), With<Paddle>>,
     time: Res<Time>,
     paddle_speed: Res<PaddleSpeed>,
 )
 {
     let mut value: f32 = 0.0;
-    if input.pressed(KeyCode::Left) {
+    if input.pressed(KeyCode::ArrowLeft) {
         value -= 1.0;
     }
-    if input.pressed(KeyCode::Right) {
+    if input.pressed(KeyCode::ArrowRight) {
         value += 1.0;
     }
 

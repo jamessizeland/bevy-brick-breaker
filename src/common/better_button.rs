@@ -82,7 +82,7 @@ fn update_release_buttons(
 
 fn update_release_buttons_with_force_key(
     mut button_query: Query<(&mut ReleaseButton, &ReleaseButtonForceKey)>,
-    input: Res<Input<KeyCode>>,
+    input: Res<ButtonInput<KeyCode>>,
 )
 {
     for (mut button, key) in button_query.iter_mut() {
