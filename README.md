@@ -1,6 +1,6 @@
 # bevy-brick-breaker
 
-A sample endless brick breaker game built with [Rust](https://www.rust-lang.org/)(1.76.0) and [Bevy](https://bevyengine.org/)(0.13.0).
+A sample endless brick breaker game built with [Rust](https://www.rust-lang.org/)(1.76.0) and [Bevy](https://bevyengine.org/)(0.13.1).
 
 ## Getting Started
 
