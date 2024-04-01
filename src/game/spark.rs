@@ -1,7 +1,7 @@
-use std::ops::Range;
+use crate::game::collider::BoxCollider;
 use bevy::prelude::*;
 use rand::prelude::random;
-use crate::game::collider::BoxCollider;
+use std::ops::Range;
 
 #[derive(Bundle, Default)]
 pub struct SparkBundle {
@@ -21,12 +21,7 @@ pub struct Spark {
 
 impl Default for Spark {
     fn default() -> Self {
-        Self::random(
-            200.0..400.0,
-            850.0..950.0,
-            0.3,
-            0.02,
-        )
+        Self::random(200.0..400.0, 850.0..950.0, 0.3, 0.02)
     }
 }
 
@@ -34,14 +29,16 @@ impl Spark {
     const TARGET_DIRECTION: Vec2 = Vec2::new(0., -1.);
 
     pub fn update(&mut self, transform: &mut Transform, delta_time: f32) {
-        self.velocity = self.velocity.lerp(
-            self.target_velocity, delta_time * self.velocity_lerp_speed);
+        self.velocity = self
+            .velocity
+            .lerp(self.target_velocity, delta_time * self.velocity_lerp_speed);
 
         transform.translation.x += delta_time * self.velocity.x;
         transform.translation.y += delta_time * self.velocity.y;
 
-        transform.rotate_z(delta_time
-            * self.rotation_sign * self.velocity.length() * self.speed_to_rotation_speed);
+        transform.rotate_z(
+            delta_time * self.rotation_sign * self.velocity.length() * self.speed_to_rotation_speed,
+        );
     }
 
     pub fn random(
@@ -49,14 +46,13 @@ impl Spark {
         target_speed: Range<f32>,
         velocity_lerp_speed: f32,
         speed_to_rotation_speed: f32,
-    ) -> Self
-    {
-        let initial_speed = initial_speed.start
-            - random::<f32>() * (initial_speed.end - initial_speed.start);
+    ) -> Self {
+        let initial_speed =
+            initial_speed.start - random::<f32>() * (initial_speed.end - initial_speed.start);
         let initial_velocity = initial_speed
             * Vec2::new((random::<f32>() - 0.5) * 0.5, random::<f32>() * 0.5).normalize_or_zero();
-        let target_speed = target_speed.start
-            - random::<f32>() * (target_speed.end - target_speed.start);
+        let target_speed =
+            target_speed.start - random::<f32>() * (target_speed.end - target_speed.start);
         Self {
             velocity: initial_velocity,
             target_velocity: target_speed * Self::TARGET_DIRECTION,
@@ -67,11 +63,7 @@ impl Spark {
     }
 }
 
-pub fn move_sparks(
-    mut spark_query: Query<(&mut Spark, &mut Transform)>,
-    time: Res<Time>,
-)
-{
+pub fn move_sparks(mut spark_query: Query<(&mut Spark, &mut Transform)>, time: Res<Time>) {
     let delta_time = time.delta_seconds();
     for (mut spark, mut transform) in spark_query.iter_mut() {
         spark.update(&mut transform, delta_time);
@@ -81,8 +73,7 @@ pub fn move_sparks(
 pub fn keep_despawning_sparks(
     mut commands: Commands,
     collectable_query: Query<(Entity, &Transform, &BoxCollider), With<Spark>>,
-)
-{
+) {
     for (entity, transform, collider) in collectable_query.iter() {
         if transform.translation.y + collider.extends.y < 0. {
             commands.entity(entity).despawn();

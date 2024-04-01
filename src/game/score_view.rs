@@ -1,18 +1,14 @@
-use bevy::prelude::*;
 use crate::game::resources::Score;
+use bevy::prelude::*;
 
 #[derive(Component)]
 pub struct ScoreView;
 #[derive(Component)]
 pub struct ScoreText;
 
-pub fn spawn_score_view(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-)
-{
-    commands.spawn(
-        (
+pub fn spawn_score_view(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands
+        .spawn((
             ScoreView {},
             NodeBundle {
                 style: Style {
@@ -27,11 +23,10 @@ pub fn spawn_score_view(
                     ..default()
                 },
                 ..default()
-            }
-        )
-    ).with_children(|parent| {
-        parent.spawn(
-            ImageBundle {
+            },
+        ))
+        .with_children(|parent| {
+            parent.spawn(ImageBundle {
                 style: Style {
                     height: Val::Percent(75.),
                     ..default()
@@ -41,34 +36,27 @@ pub fn spawn_score_view(
                     ..default()
                 },
                 ..default()
-            }
-        );
-        parent.spawn(
-            (
+            });
+            parent.spawn((
                 ScoreText {},
                 TextBundle {
-                    style: Style {
-
-                        ..default()
-                    },
-                    text: Text::from_section("x 0", TextStyle {
-                        font: asset_server.load("fonts/OpenSans-Regular.ttf"),
-                        font_size: 30.,
-                        color: Color::BLACK,
-                        ..default()
-                    }),
+                    style: Style { ..default() },
+                    text: Text::from_section(
+                        "x 0",
+                        TextStyle {
+                            font: asset_server.load("fonts/OpenSans-Regular.ttf"),
+                            font_size: 30.,
+                            color: Color::BLACK,
+                            ..default()
+                        },
+                    ),
                     ..default()
-                }
-            )
-        );
-    });
+                },
+            ));
+        });
 }
 
-pub fn despawn_score_view(
-    mut commands: Commands,
-    view_query: Query<Entity, With<ScoreView>>,
-)
-{
+pub fn despawn_score_view(mut commands: Commands, view_query: Query<Entity, With<ScoreView>>) {
     for view in view_query.iter() {
         commands.entity(view).despawn_recursive();
     }
@@ -77,8 +65,7 @@ pub fn despawn_score_view(
 pub fn update_score_view(
     score: Res<Score>,
     mut indicator_query: Query<&mut Text, With<ScoreText>>,
-)
-{
+) {
     if !score.is_changed() {
         return;
     }

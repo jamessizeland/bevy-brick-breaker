@@ -1,83 +1,119 @@
+use crate::game::collider::BoxCollider;
+use crate::game::events::BrickDestroyed;
+use crate::game::spark::SparkBundle;
 use bevy::prelude::*;
 use rand::prelude::random;
-use crate::game::collider::BoxCollider;
-use crate::game::events::{BrickDestroyed};
-use crate::game::spark::SparkBundle;
 
 const COIN_META_INDEX: usize = 0;
 
-const COLLECTABLE_METAS:  &'static [(CollectableType, CollectableMeta)] = &[
-    (CollectableType::Coin, CollectableMeta {
-        texture_path: "sprites/collectables/element_blue_square.png",
-        z_order: 0.5,
-        drop_weight: 50,
-        scale: 0.6,
-        extends: Vec2 {
-            x: 32.0,
-            y: 32.0,
+const COLLECTABLE_METAS: &'static [(CollectableType, CollectableMeta)] = &[
+    (
+        CollectableType::Coin,
+        CollectableMeta {
+            texture_path: "sprites/collectables/element_blue_square.png",
+            z_order: 0.5,
+            drop_weight: 50,
+            scale: 0.6,
+            extends: Vec2 { x: 32.0, y: 32.0 },
+            ..CollectableMeta::default()
         },
-        ..CollectableMeta::default()
-    }),
-    (CollectableType::BallClone, CollectableMeta {
-        texture_path: "sprites/collectables/ball_clone.png",
-        drop_weight: 3,
-        ..CollectableMeta::default()
-    }),
-    (CollectableType::BallDeclone, CollectableMeta {
-        texture_path: "sprites/collectables/ball_declone.png",
-        drop_weight: 3,
-        ..CollectableMeta::default()
-    }),
-    (CollectableType::BallSizeUp, CollectableMeta {
-        texture_path: "sprites/collectables/ball_size_up.png",
-        drop_weight: 1,
-        ..CollectableMeta::default()
-    }),
-    (CollectableType::BallSizeDown, CollectableMeta {
-        texture_path: "sprites/collectables/ball_size_down.png",
-        drop_weight: 1,
-        ..CollectableMeta::default()
-    }),
-    (CollectableType::BallSpeedUp, CollectableMeta {
-        texture_path: "sprites/collectables/ball_speed_up.png",
-        drop_weight: 3,
-        ..CollectableMeta::default()
-    }),
-    (CollectableType::BallSpeedDown, CollectableMeta {
-        texture_path: "sprites/collectables/ball_speed_down.png",
-        drop_weight: 3,
-        ..CollectableMeta::default()
-    }),
-    (CollectableType::GhostUp, CollectableMeta {
-        texture_path: "sprites/collectables/ghost_up.png",
-        drop_weight: 1,
-        ..CollectableMeta::default()
-    }),
-    (CollectableType::GhostDown, CollectableMeta {
-        texture_path: "sprites/collectables/ghost_down.png",
-        drop_weight: 1,
-        ..CollectableMeta::default()
-    }),
-    (CollectableType::PaddleSizeUp, CollectableMeta {
-        texture_path: "sprites/collectables/paddle_size_up.png",
-        drop_weight: 2,
-        ..CollectableMeta::default()
-    }),
-    (CollectableType::PaddleSizeDown, CollectableMeta {
-        texture_path: "sprites/collectables/paddle_size_down.png",
-        drop_weight: 2,
-        ..CollectableMeta::default()
-    }),
-    (CollectableType::PaddleSpeedUp, CollectableMeta {
-        texture_path: "sprites/collectables/paddle_speed_up.png",
-        drop_weight: 3,
-        ..CollectableMeta::default()
-    }),
-    (CollectableType::PaddleSpeedDown, CollectableMeta {
-        texture_path: "sprites/collectables/paddle_speed_down.png",
-        drop_weight: 3,
-        ..CollectableMeta::default()
-    }),
+    ),
+    (
+        CollectableType::BallClone,
+        CollectableMeta {
+            texture_path: "sprites/collectables/ball_clone.png",
+            drop_weight: 3,
+            ..CollectableMeta::default()
+        },
+    ),
+    (
+        CollectableType::BallDeclone,
+        CollectableMeta {
+            texture_path: "sprites/collectables/ball_declone.png",
+            drop_weight: 3,
+            ..CollectableMeta::default()
+        },
+    ),
+    (
+        CollectableType::BallSizeUp,
+        CollectableMeta {
+            texture_path: "sprites/collectables/ball_size_up.png",
+            drop_weight: 1,
+            ..CollectableMeta::default()
+        },
+    ),
+    (
+        CollectableType::BallSizeDown,
+        CollectableMeta {
+            texture_path: "sprites/collectables/ball_size_down.png",
+            drop_weight: 1,
+            ..CollectableMeta::default()
+        },
+    ),
+    (
+        CollectableType::BallSpeedUp,
+        CollectableMeta {
+            texture_path: "sprites/collectables/ball_speed_up.png",
+            drop_weight: 3,
+            ..CollectableMeta::default()
+        },
+    ),
+    (
+        CollectableType::BallSpeedDown,
+        CollectableMeta {
+            texture_path: "sprites/collectables/ball_speed_down.png",
+            drop_weight: 3,
+            ..CollectableMeta::default()
+        },
+    ),
+    (
+        CollectableType::GhostUp,
+        CollectableMeta {
+            texture_path: "sprites/collectables/ghost_up.png",
+            drop_weight: 1,
+            ..CollectableMeta::default()
+        },
+    ),
+    (
+        CollectableType::GhostDown,
+        CollectableMeta {
+            texture_path: "sprites/collectables/ghost_down.png",
+            drop_weight: 1,
+            ..CollectableMeta::default()
+        },
+    ),
+    (
+        CollectableType::PaddleSizeUp,
+        CollectableMeta {
+            texture_path: "sprites/collectables/paddle_size_up.png",
+            drop_weight: 2,
+            ..CollectableMeta::default()
+        },
+    ),
+    (
+        CollectableType::PaddleSizeDown,
+        CollectableMeta {
+            texture_path: "sprites/collectables/paddle_size_down.png",
+            drop_weight: 2,
+            ..CollectableMeta::default()
+        },
+    ),
+    (
+        CollectableType::PaddleSpeedUp,
+        CollectableMeta {
+            texture_path: "sprites/collectables/paddle_speed_up.png",
+            drop_weight: 3,
+            ..CollectableMeta::default()
+        },
+    ),
+    (
+        CollectableType::PaddleSpeedDown,
+        CollectableMeta {
+            texture_path: "sprites/collectables/paddle_speed_down.png",
+            drop_weight: 3,
+            ..CollectableMeta::default()
+        },
+    ),
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
@@ -116,8 +152,8 @@ impl CollectableMeta<'_> {
             texture_path: "",
             z_order: 0.0,
             extends: Vec2 {
-                x: 78.,//0.5 * 148.,
-                y: 78.,//0.5 * 148.,
+                x: 78., //0.5 * 148.,
+                y: 78., //0.5 * 148.,
             },
             scale: 0.3,
             drop_weight: 1,
@@ -127,9 +163,8 @@ impl CollectableMeta<'_> {
 
 pub fn despawn_collectables(
     mut commands: Commands,
-    collectable_query: Query<Entity, With<Collectable>>
-)
-{
+    collectable_query: Query<Entity, With<Collectable>>,
+) {
     for collectable in collectable_query.iter() {
         commands.entity(collectable).despawn();
     }
@@ -139,8 +174,7 @@ pub fn keep_spawning_collectables(
     mut commands: Commands,
     mut brick_destroyed_events: EventReader<BrickDestroyed>,
     asset_server: Res<AssetServer>,
-)
-{
+) {
     let total_drop_weight = COLLECTABLE_METAS
         .iter()
         .fold(0, |sum, i| sum + i.1.drop_weight);
@@ -148,7 +182,12 @@ pub fn keep_spawning_collectables(
     for brick_destroyed_event in brick_destroyed_events.read() {
         let number_of_coins = 2 + random::<usize>() % 7;
         for _ in 0..number_of_coins {
-            spawn_collectable(&mut commands, brick_destroyed_event.brick_position, COIN_META_INDEX, &asset_server);
+            spawn_collectable(
+                &mut commands,
+                brick_destroyed_event.brick_position,
+                COIN_META_INDEX,
+                &asset_server,
+            );
         }
 
         let mut rand = random::<usize>() % (total_drop_weight + 1);
@@ -166,7 +205,12 @@ pub fn keep_spawning_collectables(
             rand -= COLLECTABLE_METAS[potential_index].1.drop_weight;
         }
 
-        spawn_collectable(&mut commands, brick_destroyed_event.brick_position, meta_index, &asset_server);
+        spawn_collectable(
+            &mut commands,
+            brick_destroyed_event.brick_position,
+            meta_index,
+            &asset_server,
+        );
     }
 }
 
@@ -174,35 +218,32 @@ fn spawn_collectable(
     commands: &mut Commands,
     position: Vec2,
     meta_index: usize,
-    asset_server: &Res<AssetServer>
-)
-{
+    asset_server: &Res<AssetServer>,
+) {
     let (collectable_type, collectable_meta) = &COLLECTABLE_METAS[meta_index];
 
-    commands.spawn(
-        (
-            SparkBundle {
-                sprite_bundle: SpriteBundle {
-                    transform: Transform {
-                        translation: Vec3 {
-                            x: position.x,
-                            y: position.y,
-                            z: collectable_meta.z_order,
-                        },
-                        scale: collectable_meta.scale * Vec3::ONE,
-                        ..default()
+    commands.spawn((
+        SparkBundle {
+            sprite_bundle: SpriteBundle {
+                transform: Transform {
+                    translation: Vec3 {
+                        x: position.x,
+                        y: position.y,
+                        z: collectable_meta.z_order,
                     },
-                    texture: asset_server.load(collectable_meta.texture_path),
+                    scale: collectable_meta.scale * Vec3::ONE,
                     ..default()
                 },
-                box_collider: BoxCollider {
-                    extends: collectable_meta.scale * collectable_meta.extends,
-                },
+                texture: asset_server.load(collectable_meta.texture_path),
                 ..default()
             },
-            Collectable {
-                collectable_type: collectable_type.clone(),
+            box_collider: BoxCollider {
+                extends: collectable_meta.scale * collectable_meta.extends,
             },
-        )
-    );
+            ..default()
+        },
+        Collectable {
+            collectable_type: collectable_type.clone(),
+        },
+    ));
 }

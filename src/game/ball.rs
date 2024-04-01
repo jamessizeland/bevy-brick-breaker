@@ -1,9 +1,9 @@
-use bevy::prelude::*;
-use crate::{WINDOW_USABLE_WORLD_WIDTH, WINDOW_WORLD_HEIGHT};
-use crate::game::events::LastBallDestroyed;
-use crate::game::shared::xy0;
 use super::collider::BoxCollider;
 use super::resources::{BallSize, BallSpeed};
+use crate::game::events::LastBallDestroyed;
+use crate::game::shared::xy0;
+use crate::{WINDOW_USABLE_WORLD_WIDTH, WINDOW_WORLD_HEIGHT};
+use bevy::prelude::*;
 
 pub const BALL_SIZE: f32 = 22.0;
 const MAX_NUMBER_OF_BALLS: usize = 128;
@@ -39,8 +39,7 @@ pub fn spawn_first_ball(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     ball_size: Res<BallSize>,
-)
-{
+) {
     spawn_ball(
         &mut commands,
         &asset_server,
@@ -56,26 +55,24 @@ pub fn spawn_ball(
     position: Vec2,
     direction: Vec2,
     ball_size: &BallSize,
-)
-{
+) {
     commands.spawn((
         SpriteBundle {
-            transform: Transform{
+            transform: Transform {
                 translation: Vec3::new(position.x, position.y, 0.),
                 scale: ball_size.get_scale3(),
                 ..default()
             },
             texture: asset_server.load("sprites/ballBlue.png"),
-            .. default()
+            ..default()
         },
-        Ball { direction: Vec3::new(direction.x, direction.y, 0.) }
+        Ball {
+            direction: Vec3::new(direction.x, direction.y, 0.),
+        },
     ));
 }
 
-pub fn despawn_balls(
-    mut commands: Commands,
-    balls_query: Query<Entity, With<Ball>>
-) {
+pub fn despawn_balls(mut commands: Commands, balls_query: Query<Entity, With<Ball>>) {
     for ball in balls_query.iter() {
         commands.entity(ball).despawn();
     }
@@ -83,9 +80,8 @@ pub fn despawn_balls(
 
 pub fn keep_ball_synced_with_settings(
     ball_size: Res<BallSize>,
-    mut ball_query: Query<&mut Transform, With<Ball>>
-)
-{
+    mut ball_query: Query<&mut Transform, With<Ball>>,
+) {
     if ball_size.is_changed() {
         let ball_scale = ball_size.get_scale3();
 
@@ -101,8 +97,7 @@ pub fn move_balls(
     time: Res<Time>,
     ball_speed: Res<BallSpeed>,
     ball_size: Res<BallSize>,
-)
-{
+) {
     let ball_speed = ball_speed.get_speed();
     for (mut ball_transform, ball) in balls_query.iter_mut() {
         ball_transform.translation += ball_speed * time.delta_seconds() * ball.direction;
@@ -118,23 +113,18 @@ pub fn keep_destroying_balls(
     mut last_ball_destroyed_events: EventWriter<LastBallDestroyed>,
     ball_query: Query<(Entity, &Transform), With<Ball>>,
     ball_size: Res<BallSize>,
-)
-{
+) {
     let destruction_level = -2. * ball_size.get_radius();
     let mut balls = 0;
     for (entity, transform) in ball_query.iter() {
-        if transform.translation.y <= destruction_level
-        {
+        if transform.translation.y <= destruction_level {
             commands.entity(entity).despawn();
-        }
-        else
-        {
+        } else {
             balls += 1;
         }
     }
 
-    if balls == 0
-    {
+    if balls == 0 {
         last_ball_destroyed_events.send_default();
     }
 }
@@ -144,8 +134,7 @@ pub fn clone_balls(
     asset_server: &Res<AssetServer>,
     ball_query: &Query<(&Ball, &Transform)>,
     ball_size: &BallSize,
-)
-{
+) {
     let mut number_of_balls = 0;
     for _ball in ball_query.iter() {
         number_of_balls += 1;
@@ -155,16 +144,18 @@ pub fn clone_balls(
         if number_of_balls >= MAX_NUMBER_OF_BALLS {
             return;
         }
-        spawn_ball(commands, asset_server, ball_transform.translation.xy(), -ball.direction.xy(), ball_size);
+        spawn_ball(
+            commands,
+            asset_server,
+            ball_transform.translation.xy(),
+            -ball.direction.xy(),
+            ball_size,
+        );
         number_of_balls += 1;
     }
 }
 
-pub fn declone_balls(
-    commands: &mut Commands,
-    ball_query: &Query<Entity, With<Ball>>,
-)
-{
+pub fn declone_balls(commands: &mut Commands, ball_query: &Query<Entity, With<Ball>>) {
     let mut declone = false;
     for ball_entity in ball_query.iter() {
         if declone {
@@ -177,9 +168,8 @@ pub fn declone_balls(
 fn bounce_ball_on_obstacles(
     ball_radius: f32,
     balls_query: &mut Query<(&mut Transform, &mut Ball)>,
-    obstacle_query: &mut Query<(&Transform, &BoxCollider, &mut BallObstacle), Without<Ball>>
-)
-{
+    obstacle_query: &mut Query<(&Transform, &BoxCollider, &mut BallObstacle), Without<Ball>>,
+) {
     let ball_radius_squared = ball_radius * ball_radius;
 
     for (ball_transform, mut ball) in balls_query.iter_mut() {
@@ -194,13 +184,16 @@ fn bounce_ball_on_obstacles(
 
             let obstacle_to_ball = ball_position - obstacle_position;
             let obstacle_to_closest = Vec2 {
-                x: obstacle_to_ball.x.clamp(-obstacle_extends.x, obstacle_extends.x),
-                y: obstacle_to_ball.y.clamp(-obstacle_extends.y, obstacle_extends.y),
+                x: obstacle_to_ball
+                    .x
+                    .clamp(-obstacle_extends.x, obstacle_extends.x),
+                y: obstacle_to_ball
+                    .y
+                    .clamp(-obstacle_extends.y, obstacle_extends.y),
             };
 
             let potential_collision = obstacle_position + obstacle_to_closest;
-            if (potential_collision - ball_position).length_squared() <= ball_radius_squared
-            {
+            if (potential_collision - ball_position).length_squared() <= ball_radius_squared {
                 obstacle.hit_flag = true;
 
                 match obstacle.obstacle_type {
@@ -213,13 +206,15 @@ fn bounce_ball_on_obstacles(
                         let offset = 1.;
 
                         if potential_collision.x > obstacle_position.x - obstacle_extends.x + offset
-                            && potential_collision.x < obstacle_position.x + obstacle_extends.x - offset
+                            && potential_collision.x
+                                < obstacle_position.x + obstacle_extends.x - offset
                         {
                             ball_flip_direction_y = true;
                             continue;
                         }
                         if potential_collision.y > obstacle_position.y - obstacle_extends.y + offset
-                            && potential_collision.y < obstacle_position.y + obstacle_extends.y - offset
+                            && potential_collision.y
+                                < obstacle_position.y + obstacle_extends.y - offset
                         {
                             ball_flip_direction_x = true;
                             continue;
@@ -238,8 +233,7 @@ fn bounce_ball_on_obstacles(
 
         if let Some(direction) = ball_override_direction {
             ball.direction = xy0(direction.normalize());
-        }
-        else {
+        } else {
             if ball_flip_direction_x {
                 ball.direction.x *= -1.;
             }
@@ -250,12 +244,7 @@ fn bounce_ball_on_obstacles(
     }
 }
 
-
-fn bounce_ball_on_edges(
-    ball_radius: f32,
-    balls_query: &mut Query<(&mut Transform, &mut Ball)>,
-)
-{
+fn bounce_ball_on_edges(ball_radius: f32, balls_query: &mut Query<(&mut Transform, &mut Ball)>) {
     let min_x = ball_radius;
     let max_x = WINDOW_USABLE_WORLD_WIDTH - ball_radius;
     let max_y = WINDOW_WORLD_HEIGHT - ball_radius;
