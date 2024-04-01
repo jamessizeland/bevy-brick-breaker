@@ -14,7 +14,12 @@ impl Default for BoxCollider {
 }
 
 impl BoxCollider {
-    pub fn overlap(box1_center: Vec2, box1_extents: Vec2, box2_center: Vec2, box2_extents: Vec2) -> bool {
+    pub fn overlap(
+        box1_center: Vec2,
+        box1_extents: Vec2,
+        box2_center: Vec2,
+        box2_extents: Vec2,
+    ) -> bool {
         let box1_min = box1_center - box1_extents;
         let box1_max = box1_center + box1_extents;
 

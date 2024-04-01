@@ -1,7 +1,7 @@
-use std::time::Duration;
-use bevy::prelude::*;
-use crate::game::ball::{BALL_SIZE, BallObstacleType};
+use crate::game::ball::{BallObstacleType, BALL_SIZE};
 use crate::game::paddle::PADDLE_WIDTH;
+use bevy::prelude::*;
+use std::time::Duration;
 
 #[derive(Resource, Default)]
 pub struct Score(pub usize);
@@ -27,7 +27,11 @@ impl BallSpeed {
     pub fn change_points(&mut self, delta_points: i32) {
         let points = (self.points as i32 + delta_points).max(0);
         self.points = (points as usize).min(Self::POINT_SPEEDS.len() - 1);
-        println!("BallSpeed.points: {}/{}", self.points, Self::POINT_SPEEDS.len() - 1);
+        println!(
+            "BallSpeed.points: {}/{}",
+            self.points,
+            Self::POINT_SPEEDS.len() - 1
+        );
     }
 
     pub fn get_speed(&self) -> f32 {
@@ -55,7 +59,11 @@ impl BallSize {
     pub fn change_points(&mut self, delta_points: i32) {
         let points = (self.points as i32 + delta_points).max(0);
         self.points = (points as usize).min(Self::POINT_SCALES.len() - 1);
-        println!("BallSize.points: {}/{}", self.points, Self::POINT_SCALES.len() - 1);
+        println!(
+            "BallSize.points: {}/{}",
+            self.points,
+            Self::POINT_SCALES.len() - 1
+        );
     }
 
     pub fn get_scale(&self) -> f32 {
@@ -87,12 +95,18 @@ pub struct PaddleSpeed {
 
 impl PaddleSpeed {
     const DEFAULT_POINTS: usize = 4;
-    const POINT_SPEEDS: &'static [f32] = &[200., 250., 300., 350., 400., 500., 600., 800., 1000., 1200., 1400.];
+    const POINT_SPEEDS: &'static [f32] = &[
+        200., 250., 300., 350., 400., 500., 600., 800., 1000., 1200., 1400.,
+    ];
 
     pub fn change_points(&mut self, delta_points: i32) {
         let points = (self.points as i32 + delta_points).max(0);
         self.points = (points as usize).min(Self::POINT_SPEEDS.len() - 1);
-        println!("PaddleSpeed.points: {}/{}", self.points, Self::POINT_SPEEDS.len() - 1);
+        println!(
+            "PaddleSpeed.points: {}/{}",
+            self.points,
+            Self::POINT_SPEEDS.len() - 1
+        );
     }
 
     pub fn get_speed(&self) -> f32 {
@@ -116,12 +130,17 @@ pub struct PaddleSize {
 impl PaddleSize {
     const DEFAULT_POINTS: usize = 3;
     const MIN_WIDTH: f32 = 0.75 * PADDLE_WIDTH;
-    const POINT_EXTRA_WIDTHS: &'static [f32] = &[0., 25., 49., 81., 121., 169., 225., 289., 361., 441., 529.];
+    const POINT_EXTRA_WIDTHS: &'static [f32] =
+        &[0., 25., 49., 81., 121., 169., 225., 289., 361., 441., 529.];
 
     pub fn change_points(&mut self, delta_points: i32) {
         let points = (self.points as i32 + delta_points).max(0);
         self.points = (points as usize).min(Self::POINT_EXTRA_WIDTHS.len() - 1);
-        println!("PaddleSize.points: {}/{}", self.points, Self::POINT_EXTRA_WIDTHS.len() - 1);
+        println!(
+            "PaddleSize.points: {}/{}",
+            self.points,
+            Self::POINT_EXTRA_WIDTHS.len() - 1
+        );
     }
 
     pub fn get_width(&self) -> f32 {
@@ -151,8 +170,7 @@ impl BrickGhost {
     pub fn get_obstacle_type(&self) -> BallObstacleType {
         if self.enabled {
             BallObstacleType::Ghost
-        }
-        else {
+        } else {
             BallObstacleType::Natural
         }
     }

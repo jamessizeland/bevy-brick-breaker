@@ -1,21 +1,22 @@
-use bevy::prelude::*;
-use crate::game::collectable::{Collectable, CollectableType};
-use super::resources::{BallSize, BallSpeed, BrickGhost, PaddleSize, PaddleSpeed, Score};
-use super::ball::{Ball, clone_balls, declone_balls};
+use super::ball::{clone_balls, declone_balls, Ball};
 use super::collider::BoxCollider;
 use super::paddle::Paddle;
+use super::resources::{BallSize, BallSpeed, BrickGhost, PaddleSize, PaddleSpeed, Score};
+use crate::game::collectable::{Collectable, CollectableType};
+use bevy::prelude::*;
 
-pub fn keep_ball_at_paddle_center (
+pub fn keep_ball_at_paddle_center(
     paddle_query: Query<(&Transform, &BoxCollider), With<Paddle>>,
     mut ball_query: Query<&mut Transform, (With<Ball>, Without<Paddle>)>,
     ball_size: Res<BallSize>,
-)
-{
+) {
     if let Ok((paddle_transform, paddle_collider)) = paddle_query.get_single() {
         for mut ball in ball_query.iter_mut() {
             ball.translation = Vec3 {
                 x: paddle_transform.translation.x,
-                y: paddle_transform.translation.y + paddle_collider.extends.y + ball_size.get_radius(),
+                y: paddle_transform.translation.y
+                    + paddle_collider.extends.y
+                    + ball_size.get_radius(),
                 z: 0.,
             }
         }
@@ -35,13 +36,14 @@ pub fn collect_collectables(
     mut paddle_speed: ResMut<PaddleSpeed>,
     mut brick_ghost: ResMut<BrickGhost>,
     asset_server: Res<AssetServer>,
-)
-{
+) {
     if let Ok((paddle_transform, paddle_collider)) = paddle_query.get_single() {
         for (entity, transform, collider, collectable) in collectable_query.iter() {
             let overlap = BoxCollider::overlap(
-                paddle_transform.translation.xy(), paddle_collider.extends,
-                transform.translation.xy(), collider.extends,
+                paddle_transform.translation.xy(),
+                paddle_collider.extends,
+                transform.translation.xy(),
+                collider.extends,
             );
 
             if overlap {
@@ -94,5 +96,9 @@ pub fn collect_collectables(
 }
 
 pub fn xy0(xy: Vec2) -> Vec3 {
-    Vec3 { x: xy.x, y: xy.y, z: 0.0 }
+    Vec3 {
+        x: xy.x,
+        y: xy.y,
+        z: 0.0,
+    }
 }

@@ -18,5 +18,3 @@ opt-level = 1
 [profile.release]
 lto = true
 codegen-units = 1
-
-
